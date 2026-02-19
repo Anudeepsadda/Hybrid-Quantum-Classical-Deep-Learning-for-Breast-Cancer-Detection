@@ -4,15 +4,12 @@ import streamlit as st
 
 MODEL_PATH = "final_best_model.pth"
 
-# Paste your File ID here
 FILE_ID = "1vYNgfefvy7XW_bNb1A6mxiyxpbgDNlgS"
 
-# Direct download link
-url = f"https://drive.google.com/file/d/1vYNgfefvy7XW_bNb1A6mxiyxpbgDNlgS/view?usp=sharing"
+url = f"https://drive.google.com/uc?id={FILE_ID}"
 
-# Download model if not already downloaded
 if not os.path.exists(MODEL_PATH):
-    st.warning("Downloading model from Google Drive... Please wait ⏳")
+    st.warning("Downloading model... Please wait ⏳")
     gdown.download(url, MODEL_PATH, quiet=False)
     st.success("Model downloaded successfully ✅")
 
@@ -192,4 +189,5 @@ if uploaded_file:
         file_name="diagnosis_report.txt"
 
     )
+
 
