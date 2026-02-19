@@ -5,10 +5,10 @@ import streamlit as st
 MODEL_PATH = "final_best_model.pth"
 
 # Paste your File ID here
-FILE_ID = "1ABCxyz12345"
+FILE_ID = "1vYNgfefvy7XW_bNb1A6mxiyxpbgDNlgS"
 
 # Direct download link
-url = f"https://drive.google.com/uc?id={FILE_ID}"
+url = f"https://drive.google.com/file/d/1vYNgfefvy7XW_bNb1A6mxiyxpbgDNlgS/view?usp=sharing"
 
 # Download model if not already downloaded
 if not os.path.exists(MODEL_PATH):
@@ -192,3 +192,4 @@ if uploaded_file:
         file_name="diagnosis_report.txt"
 
     )
+
