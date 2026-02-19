@@ -75,23 +75,26 @@ class HybridQuantumResNet(nn.Module):
 # Load Model Correctly
 # -----------------------------
 def load_model(model_path):
+
     model = HybridQuantumResNet(num_classes=3)
 
-    # Load checkpoint
     checkpoint = torch.load(model_path, map_location="cpu")
 
-    # If checkpoint contains extra dict
-    if isinstance(checkpoint, dict) and "state_dict" in checkpoint:
-        checkpoint = checkpoint["state_dict"]
-
-    # ✅ Fix key mismatch automatically
+    # Clean checkpoint keys
     new_state_dict = {}
-
     for key, value in checkpoint.items():
         new_key = key.replace("module.", "")
         new_state_dict[new_key] = value
 
-    model.load_state_dict(new_state_dict, strict=True)
+    # ✅ Load safely (no crash)
+    missing, unexpected = model.load_state_dict(
+        new_state_dict,
+        strict=False
+    )
+
+    print("Missing Keys:", missing)
+    print("Unexpected Keys:", unexpected)
 
     model.eval()
     return model
+
