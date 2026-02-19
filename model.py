@@ -48,6 +48,9 @@ class HybridResNetVQC(nn.Module):
 # -----------------------------
 def load_model(weight_path):
     model = HybridResNetVQC()
-    model.load_state_dict(torch.load(weight_path, map_location="cpu"))
+    model.load_state_dict(
+        torch.load(weight_path, map_location="cpu", weights_only=False)
+    )
     model.eval()
+
     return model
