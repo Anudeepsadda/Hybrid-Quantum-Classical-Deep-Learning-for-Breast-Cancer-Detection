@@ -1,3 +1,21 @@
+import os
+import gdown
+import streamlit as st
+
+MODEL_PATH = "final_best_model.pth"
+
+# Paste your File ID here
+FILE_ID = "1ABCxyz12345"
+
+# Direct download link
+url = f"https://drive.google.com/uc?id={FILE_ID}"
+
+# Download model if not already downloaded
+if not os.path.exists(MODEL_PATH):
+    st.warning("Downloading model from Google Drive... Please wait ⏳")
+    gdown.download(url, MODEL_PATH, quiet=False)
+    st.success("Model downloaded successfully ✅")
+
 import streamlit as st
 import torch
 import torch.nn.functional as F
@@ -172,4 +190,5 @@ if uploaded_file:
         label="Download Report as TXT",
         data=report_text,
         file_name="diagnosis_report.txt"
+
     )
