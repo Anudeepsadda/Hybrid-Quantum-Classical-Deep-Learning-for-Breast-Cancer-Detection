@@ -4,47 +4,33 @@ from torchvision import models
 
 
 # ==========================================================
-# RESNET50 BREAST CANCER CLASSIFIER (3-Class)
+# ResNet50 Breast Cancer Classifier (3 Classes)
 # ==========================================================
 class ResNetBreastCancer(nn.Module):
     def __init__(self, num_classes=3):
-        super(ResNetBreastCancer, self).__init__()
+        super().__init__()
 
-        # Load ResNet50 backbone (no pretrained weights for deployment)
-        self.resnet = models.resnet50(weights=None)
-
-        # Replace Final Fully Connected Layer for 3 Classes
-        self.resnet.fc = nn.Linear(
-            self.resnet.fc.in_features,
-            num_classes
-        )
+        self.model = models.resnet50(weights=None)
+        self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
 
     def forward(self, x):
-        return self.resnet(x)
+        return self.model(x)
 
 
 # ==========================================================
-# LOAD MODEL FUNCTION
+# Load Model Function
 # ==========================================================
 def load_model(weight_path):
-    """
-    Loads the ResNet50 breast cancer classifier model safely.
-    Compatible with Streamlit Cloud Python 3.13+
-    """
 
-    # Create Model Architecture
     model = ResNetBreastCancer(num_classes=3)
 
-    # Load Weights Safely
     state_dict = torch.load(
         weight_path,
         map_location="cpu",
-        weights_only=False   # IMPORTANT FIX for Streamlit + Torch 2.6+
+        weights_only=False
     )
 
     model.load_state_dict(state_dict)
-
-    # Set to Evaluation Mode
     model.eval()
 
     return model
