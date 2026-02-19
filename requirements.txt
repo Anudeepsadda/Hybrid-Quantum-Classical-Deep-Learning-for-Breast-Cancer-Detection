@@ -6,6 +6,5 @@ matplotlib
 opencv-python-headless
 scikit-learn
 
-torch==2.0.1
-torchvision==0.15.2
-pennylane==0.33.0
+torch
+torchvision
