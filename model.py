@@ -3,34 +3,40 @@ import torch.nn as nn
 from torchvision import models
 
 
-# ==========================================================
+# ============================================
 # ResNet50 Breast Cancer Classifier (3 Classes)
-# ==========================================================
-class ResNetBreastCancer(nn.Module):
+# ============================================
+class BreastCancerResNet(nn.Module):
     def __init__(self, num_classes=3):
         super().__init__()
 
-        self.model = models.resnet50(weights=None)
-        self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
+        # Load ResNet50 Backbone
+        self.resnet = models.resnet50(weights=None)
+
+        # Replace final FC layer for 3-class classification
+        self.resnet.fc = nn.Linear(
+            self.resnet.fc.in_features,
+            num_classes
+        )
 
     def forward(self, x):
-        return self.model(x)
+        return self.resnet(x)
 
 
-# ==========================================================
-# Load Model Function
-# ==========================================================
-def load_model(weight_path):
+# ============================================
+# Load Model Function (Streamlit Compatible)
+# ============================================
+def load_model(model_path):
 
-    model = ResNetBreastCancer(num_classes=3)
+    model = BreastCancerResNet(num_classes=3)
 
+    # ✅ Fix: Load GPU-trained model safely on CPU
     state_dict = torch.load(
-        weight_path,
-        map_location="cpu",
-        weights_only=False
+        model_path,
+        map_location=torch.device("cpu")
     )
 
     model.load_state_dict(state_dict)
-    model.eval()
 
+    model.eval()
     return model
