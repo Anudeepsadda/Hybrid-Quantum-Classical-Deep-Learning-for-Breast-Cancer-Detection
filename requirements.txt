@@ -1,10 +1,11 @@
 streamlit
-torch
-torchvision
-pennylane
+gdown
 numpy
-opencv-python-headless
 pillow
 matplotlib
+opencv-python-headless
 scikit-learn
-gdown
+
+torch==2.0.1
+torchvision==0.15.2
+pennylane==0.33
