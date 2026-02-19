@@ -1,57 +1,50 @@
 import torch
 import torch.nn as nn
-import torchvision.models as models
-import pennylane as qml
-from pennylane.qnn import TorchLayer
+from torchvision import models
 
-# -----------------------------
-# Quantum Circuit Setup
-# -----------------------------
-n_qubits = 4
-n_layers = 2
 
-dev = qml.device("default.qubit", wires=n_qubits)
+# ==========================================================
+# RESNET50 BREAST CANCER CLASSIFIER (3-Class)
+# ==========================================================
+class ResNetBreastCancer(nn.Module):
+    def __init__(self, num_classes=3):
+        super(ResNetBreastCancer, self).__init__()
 
-@qml.qnode(dev, interface="torch")
-def quantum_circuit(inputs, weights):
-    qml.AngleEmbedding(inputs, wires=range(n_qubits))
-    qml.BasicEntanglerLayers(weights, wires=range(n_qubits))
-    return [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
+        # Load ResNet50 backbone (no pretrained weights for deployment)
+        self.resnet = models.resnet50(weights=None)
 
-weight_shapes = {"weights": (n_layers, n_qubits)}
-qlayer = TorchLayer(quantum_circuit, weight_shapes)
-
-# -----------------------------
-# Hybrid ResNet + VQC Model
-# -----------------------------
-class HybridResNetVQC(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-        self.resnet = models.resnet50(pretrained=True)
-        self.resnet.fc = nn.Identity()
-
-        self.fc1 = nn.Linear(2048, 4)
-        self.vqc = qlayer
-        self.fc2 = nn.Linear(4, 3)
+        # Replace Final Fully Connected Layer for 3 Classes
+        self.resnet.fc = nn.Linear(
+            self.resnet.fc.in_features,
+            num_classes
+        )
 
     def forward(self, x):
-        x = self.resnet(x)
-        x = self.fc1(x)
-        x = self.vqc(x)
-        x = self.fc2(x)
-        return x
+        return self.resnet(x)
 
 
-# -----------------------------
-# Load Model Function
-# -----------------------------
+# ==========================================================
+# LOAD MODEL FUNCTION
+# ==========================================================
 def load_model(weight_path):
-    model = HybridResNetVQC()
-    model.load_state_dict(
-        torch.load(weight_path, map_location="cpu")
+    """
+    Loads the ResNet50 breast cancer classifier model safely.
+    Compatible with Streamlit Cloud Python 3.13+
+    """
+
+    # Create Model Architecture
+    model = ResNetBreastCancer(num_classes=3)
+
+    # Load Weights Safely
+    state_dict = torch.load(
+        weight_path,
+        map_location="cpu",
+        weights_only=False   # IMPORTANT FIX for Streamlit + Torch 2.6+
     )
+
+    model.load_state_dict(state_dict)
+
+    # Set to Evaluation Mode
     model.eval()
 
     return model
-
