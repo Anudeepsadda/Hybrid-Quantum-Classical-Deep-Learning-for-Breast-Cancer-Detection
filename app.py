@@ -31,16 +31,18 @@ st.markdown("### ResNet50 + Variational Quantum Classifier (VQC) + Grad-CAM")
 # ==========================================================
 # GOOGLE DRIVE MODEL DOWNLOAD
 # ==========================================================
+
 MODEL_PATH = "best_model.pth"
 
 FILE_ID = "15Ak5r05RLhr-6v77J5DyOoBceov0n54n"
-DOWNLOAD_URL = f"https://drive.google.com/uc?id={FILE_ID}"
+
+# ✅ Correct direct download link
+url = f"https://drive.google.com/uc?id={FILE_ID}"
 
 if not os.path.exists(MODEL_PATH):
-    st.warning("📥 Downloading model from Google Drive... Please wait ⏳")
-    gdown.download(DOWNLOAD_URL, MODEL_PATH, quiet=False)
-    st.success("✅ Model downloaded successfully!")
-
+    st.warning("Downloading model from Google Drive... ⏳")
+    gdown.download(url, MODEL_PATH, quiet=False)
+    st.success("Model downloaded successfully ✅")
 
 # ==========================================================
 # LOAD MODEL
@@ -235,4 +237,5 @@ if uploaded_file:
         data=report_text,
         file_name="diagnosis_report.txt"
     )
+
 
