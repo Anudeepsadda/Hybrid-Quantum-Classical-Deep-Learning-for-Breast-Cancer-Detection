@@ -4,16 +4,14 @@ from torchvision import models
 
 
 # ==========================================================
-# RESNET50 BREAST CANCER CLASSIFIER (3-Class)
+# RESNET50 CLASSIFIER
 # ==========================================================
 class ResNetBreastCancer(nn.Module):
     def __init__(self, num_classes=3):
-        super(ResNetBreastCancer, self).__init__()
+        super().__init__()
 
-        # Load ResNet50 backbone (no pretrained weights for deployment)
         self.resnet = models.resnet50(weights=None)
 
-        # Replace Final Fully Connected Layer for 3 Classes
         self.resnet.fc = nn.Linear(
             self.resnet.fc.in_features,
             num_classes
@@ -24,27 +22,28 @@ class ResNetBreastCancer(nn.Module):
 
 
 # ==========================================================
-# LOAD MODEL FUNCTION
+# LOAD MODEL SAFELY (IGNORE QUANTUM KEYS)
 # ==========================================================
 def load_model(weight_path):
-    """
-    Loads the ResNet50 breast cancer classifier model safely.
-    Compatible with Streamlit Cloud Python 3.13+
-    """
 
-    # Create Model Architecture
     model = ResNetBreastCancer(num_classes=3)
 
-    # Load Weights Safely
-    state_dict = torch.load(
+    # Load checkpoint dictionary
+    checkpoint = torch.load(
         weight_path,
         map_location="cpu",
-        weights_only=False   # IMPORTANT FIX for Streamlit + Torch 2.6+
+        weights_only=False
     )
 
-    model.load_state_dict(state_dict)
+    # Remove unwanted quantum layer weights automatically
+    filtered_checkpoint = {}
 
-    # Set to Evaluation Mode
+    for key, value in checkpoint.items():
+        if "resnet" in key:   # only keep ResNet weights
+            filtered_checkpoint[key] = value
+
+    # Load only ResNet weights
+    model.load_state_dict(filtered_checkpoint, strict=False)
+
     model.eval()
-
     return model
