@@ -2,8 +2,8 @@ streamlit
 gdown
 numpy
 pillow
-matplotlib
 opencv-python-headless
 scikit-learn
 torch
 torchvision
+pennylane
